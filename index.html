@@ -140,7 +140,7 @@
 
     document.getElementById('complete').addEventListener('click', () => {
       const inputText = state.join(', ');
-      fetch('https://script.google.com/macros/s/AKfycbxaMQylGVqhb0UPard6fjsh8cpHIE4BoW5h7jPmAAF-Z8t1Xximh9VXA7Dg34AELK1GVQ/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbxGqNAUM3O1c8CVizo9QEJ-1d9s_7NfJoEFZfhXhQwIlehLbXo7fgRAI9vbTNPG-f7kIA/exec', {
         method: 'POST',
         body: JSON.stringify({ text: inputText }),
         headers: { 'Content-Type': 'application/json' }
