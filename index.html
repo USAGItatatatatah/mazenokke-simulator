@@ -55,7 +55,7 @@
 
   <div id="log"></div>
 
-  <button id="complete">これで登録！</button>
+  <button id="complete">これで登録！</button>（3秒ほどかかります）
   <div id="result"></div>
 
   <script>
@@ -140,14 +140,19 @@
 
     document.getElementById('complete').addEventListener('click', () => {
       const inputText = encodeURIComponent(state.join(', '));
-      fetch(`https://script.google.com/macros/s/AKfycbzer6UUPItgE1G5jdrznZQxkVkyULqgripeA7e0GdexhSHgk4yyFY6RUeJdU5l5rCFD5Q/exec?text=${inputText}`)
+      fetch(`https://script.google.com/macros/s/AKfycbzi3a_xPxrhagBWav-NxO6smQ4It2Yj1LgnP2uN-7fC0ovIGx3bx7WHfMmo_N5yUwOliQ/exec?text=${inputText}`)
         .then(res => res.json())
         .then(data => {
-          if (data.count -1 === 0) {
-            resultDiv.innerHTML = `あなたと同じ食べ方をした人はまだいないようです！<br>しかしそれは決して恥じることではないのです。`;
+          const sameCount = data.count - 1;
+          const total = data.total || data.count;
+          let message = '<br>登録を受け付けました！';
+          if (sameCount === 0) {
+            message += '<br>あなたと同じ食べ方をした人はまだいないようです！<br>しかしそれは決して恥じることではないのです。';
           } else {
-            resultDiv.innerHTML = `${data.count -1}人があなたと全く同じ食べ方をしました！ すごい奇跡！`;
+            message += `<br>${sameCount}人があなたと全く同じ食べ方をしています！ すごい奇跡！`;
           }
+          message += `<br>（現在 ${total} 人が登録しています）`;
+          resultDiv.innerHTML = message;
         })
         .catch(() => {
           resultDiv.innerHTML = '送信に失敗しました。';
