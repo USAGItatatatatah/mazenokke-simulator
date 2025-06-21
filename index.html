@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>まぜのっけ朝食シミュレーター</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #fefefe; }
+    .actions {
+      position: absolute;
+      background: white;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      display: none;
+      z-index: 10;
+      max-width: 200px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .action-btn {
+      margin: 5px 0;
+      display: block;
+      width: 100%;
+    }
+    #log { margin-top: 20px; white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 8px; }
+    #complete { margin-top: 20px; }
+    #main-image-container { max-width: 100%; position: relative; margin-bottom: 20px; }
+    #main-image { width: 100%; max-width: 400px; height: auto; border-radius: 10px; }
+    .hotspot {
+      position: absolute;
+      cursor: pointer;
+      background: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>まぜのっけ朝食シミュレーター</h1>
+
+  <p>
+    まぜのっけの食べ方は、千差万別十人十色。<br>
+    各種品目を選択して、あなたの食べ順を登録してみよう。<br><br>
+    ※紅しょうがはないよ。
+  </p>
+
+  <div id="main-image-container">
+    <img id="main-image" src="https://i.imgur.com/aWpwzBr.jpg" alt="まぜのっけ朝食の画像（画像が表示されない場合、外部リンクの確認を）">
+    <div class="hotspot" data-name="醤油" data-top="7.24" data-left="20.00" data-width="11.50" data-height="37.10"></div>
+    <div class="hotspot" data-name="オクラ＆温玉" data-top="15.94" data-left="35.00" data-width="25.00" data-height="36.82"></div>
+    <div class="hotspot" data-name="かつおぶし" data-top="21.19" data-left="60.00" data-width="22.50" data-height="26.19"></div>
+    <div class="hotspot" data-name="ご飯" data-top="39.69" data-left="10.00" data-width="31.25" data-height="54.61"></div>
+    <div class="hotspot" data-name="味噌汁" data-top="41.12" data-left="41.25" data-width="27.25" data-height="50.21"></div>
+    <div class="hotspot" data-name="牛皿" data-top="45.12" data-left="65.00" data-width="25.00" data-height="45.02"></div>
+    <div class="actions" id="actions"></div>
+  </div>
+
+  <div id="log"></div>
+
+  <button id="complete">これで登録！</button>
+  <div id="result"></div>
+
+  <script>
+    const data = {
+      'オクラ＆温玉': {
+        actions: ['混ぜる', 'ご飯に乗せる', '半分だけ乗せる', 'そのまま食べる']
+      },
+      '牛皿': {
+        actions: ['ご飯に乗せる', '単体で食べる', 'ご飯といっしょに食べる','オクラ＆温玉に入れる']
+      },
+      'かつおぶし': {
+        actions: ['ご飯にかける', 'オクラ＆温玉にかける', '牛皿にかける']
+      },
+      'ご飯': {
+        actions: ['混ぜる', '食べる']
+      },
+      '味噌汁': {
+        actions: ['飲む']
+      },
+      '醤油': {
+        actions: ['オクラ＆温玉にかける', 'ご飯にかける', '牛皿にかける']
+      }
+    };
+
+    const state = [];
+    const actionsDiv = document.getElementById('actions');
+    const logDiv = document.getElementById('log');
+    const resultDiv = document.getElementById('result');
+
+    function showActions(ingredient, x, y) {
+      actionsDiv.innerHTML = '';
+      actionsDiv.style.display = 'block';
+
+      const rectInfo = document.querySelector(`.hotspot[data-name='${ingredient}']`).getBoundingClientRect();
+      const centerX = (rectInfo.left + rectInfo.width) / 2 + window.scrollX;
+      const centerY = (rectInfo.top + rectInfo.height) / 2 + window.scrollY;
+
+      let offsetX = rectInfo.width;
+      let offsetY = -rectInfo.height;
+
+      actionsDiv.style.left = `${centerX + offsetX}px`;
+      actionsDiv.style.top = `${centerY + offsetY}px`;
+
+      const title = document.createElement('div');
+      title.innerHTML = `<strong>${ingredient}</strong> のアクション:`;
+      actionsDiv.appendChild(title);
+
+      data[ingredient].actions.forEach(action => {
+        const btn = document.createElement('button');
+        btn.textContent = action;
+        btn.className = 'action-btn';
+        btn.onclick = () => {
+          const actionText = `${ingredient} → ${action}`;
+          if (!state.includes(actionText)) {
+            state.push(actionText);
+            updateLog();
+          }
+          actionsDiv.style.display = 'none';
+        };
+        actionsDiv.appendChild(btn);
+      });
+    }
+
+    function updateLog() {
+      logDiv.innerHTML = `<strong>あなたの食べ方：</strong><br>` +
+        state.map((entry, index) => {
+          return `${index + 1}. ${entry}　<button onclick="removeEntry(${index})">削除</button>`;
+        }).join('<br>');
+    }
+
+    function removeEntry(index) {
+      state.splice(index, 1);
+      updateLog();
+    }
+
+    document.querySelectorAll('.hotspot').forEach(hotspot => {
+      hotspot.addEventListener('click', (e) => {
+        const name = hotspot.dataset.name;
+        showActions(name, e.pageX, e.pageY);
+      });
+    });
+
+    document.getElementById('complete').addEventListener('click', () => {
+      const inputText = state.join(', ');
+      fetch('https://script.google.com/macros/s/AKfycbxaMQylGVqhb0UPard6fjsh8cpHIE4BoW5h7jPmAAF-Z8t1Xximh9VXA7Dg34AELK1GVQ/exec', {
+        method: 'POST',
+        body: JSON.stringify({ text: inputText }),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        resultDiv.innerHTML = `${data.count}人があなたと同じ食べ方をしました！`;
+      })
+      .catch(() => {
+        resultDiv.innerHTML = '送信に失敗しました。';
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      const isHotspot = e.target.closest('.hotspot');
+      const isActions = e.target.closest('#actions');
+      if (!isHotspot && !isActions) {
+        actionsDiv.style.display = 'none';
+      }
+    });
+
+    function positionHotspots() {
+      const img = document.getElementById('main-image');
+      document.querySelectorAll('.hotspot').forEach(hotspot => {
+        const top = parseFloat(hotspot.dataset.top);
+        const left = parseFloat(hotspot.dataset.left);
+        const width = parseFloat(hotspot.dataset.width);
+        const height = parseFloat(hotspot.dataset.height);
+
+        hotspot.style.top = `${(top / 100) * img.clientHeight}px`;
+        hotspot.style.left = `${(left / 100) * img.clientWidth}px`;
+        hotspot.style.width = `${(width / 100) * img.clientWidth}px`;
+        hotspot.style.height = `${(height / 100) * img.clientHeight}px`;
+      });
+    }
+
+    window.addEventListener('load', () => {
+      const img = document.getElementById('main-image');
+      if (img.complete) {
+        positionHotspots();
+      } else {
+        img.onload = positionHotspots;
+      }
+    });
+
+    window.addEventListener('resize', positionHotspots);
+
+    const debugMode = false;
+    if (debugMode) {
+      document.querySelectorAll('.hotspot').forEach(h => {
+        h.style.background = 'rgba(255, 255, 0, 0.15)';
+      });
+    }
+  </script>
+</body>
+</html>
