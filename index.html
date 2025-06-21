@@ -143,7 +143,7 @@
       fetch(`https://script.google.com/macros/s/AKfycbzer6UUPItgE1G5jdrznZQxkVkyULqgripeA7e0GdexhSHgk4yyFY6RUeJdU5l5rCFD5Q/exec?text=${inputText}`)
         .then(res => res.json())
         .then(data => {
-          if (data.count === 0) {
+          if (data.count -1 === 0) {
             resultDiv.innerHTML = `あなたと同じ食べ方をした人はまだいません。<br>しかしそれは決して恥じることではないのです。`;
           } else {
             resultDiv.innerHTML = `${data.count}人があなたと同じ食べ方をしました！`;
