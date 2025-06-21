@@ -89,18 +89,18 @@
       actionsDiv.innerHTML = '';
       actionsDiv.style.display = 'block';
 
-      const rectInfo = document.querySelector(`.hotspot[data-name='${ingredient}']`).getBoundingClientRect();
+      const rectInfo = document.querySelector(.hotspot[data-name='${ingredient}']).getBoundingClientRect();
       const centerX = (rectInfo.left + rectInfo.width) / 2 + window.scrollX;
       const centerY = (rectInfo.top + rectInfo.height) / 2 + window.scrollY;
 
       let offsetX = rectInfo.width;
       let offsetY = -rectInfo.height;
 
-      actionsDiv.style.left = `${centerX + offsetX}px`;
-      actionsDiv.style.top = `${centerY + offsetY}px`;
+      actionsDiv.style.left = ${centerX + offsetX}px;
+      actionsDiv.style.top = ${centerY + offsetY}px;
 
       const title = document.createElement('div');
-      title.innerHTML = `<strong>${ingredient}</strong> のアクション:`;
+      title.innerHTML = <strong>${ingredient}</strong> のアクション:;
       actionsDiv.appendChild(title);
 
       data[ingredient].actions.forEach(action => {
@@ -108,7 +108,7 @@
         btn.textContent = action;
         btn.className = 'action-btn';
         btn.onclick = () => {
-          const actionText = `${ingredient} → ${action}`;
+          const actionText = ${ingredient} → ${action};
           if (!state.includes(actionText)) {
             state.push(actionText);
             updateLog();
@@ -120,9 +120,9 @@
     }
 
     function updateLog() {
-      logDiv.innerHTML = `<strong>あなたの食べ方：</strong><br>` +
+      logDiv.innerHTML = <strong>あなたの食べ方：</strong><br> +
         state.map((entry, index) => {
-          return `${index + 1}. ${entry}　<button onclick="removeEntry(${index})">削除</button>`;
+          return ${index + 1}. ${entry}　<button onclick="removeEntry(${index})">削除</button>;
         }).join('<br>');
     }
 
@@ -140,9 +140,18 @@
 
     document.getElementById('complete').addEventListener('click', () => {
       const inputText = encodeURIComponent(state.join(', '));
-      const googleFormURL = `https://docs.google.com/forms/d/e/1FAIpQLSdo-MLN0S-lsD0jSDuNvkV98gb85Ipso8AXyPmSZiAR4tX7bQ/viewform?usp=pp_url&entry.963564918=${inputText}`;
-      window.open(googleFormURL, '_blank');
-      resultDiv.innerHTML = `送信用フォームが開きました。内容を確認して送信してください。`;
+      fetch('https://script.google.com/macros/s/AKfycbzer6UUPItgE1G5jdrznZQxkVkyULqgripeA7e0GdexhSHgk4yyFY6RUeJdU5l5rCFD5Q/exec?text=${inputText}')
+        .then(res => res.json())
+        .then(data => {
+          if (data.count === 0) {
+            resultDiv.innerHTML = あなたと同じ食べ方をした人はまだいません。<br>しかしそれは決して恥じることではないのです。;
+          } else {
+            resultDiv.innerHTML = ${data.count}人があなたと同じ食べ方をしました！;
+          }
+        })
+        .catch(() => {
+          resultDiv.innerHTML = '送信に失敗しました。';
+        });
     });
 
     document.addEventListener('click', (e) => {
@@ -161,10 +170,10 @@
         const width = parseFloat(hotspot.dataset.width);
         const height = parseFloat(hotspot.dataset.height);
 
-        hotspot.style.top = `${(top / 100) * img.clientHeight}px`;
-        hotspot.style.left = `${(left / 100) * img.clientWidth}px`;
-        hotspot.style.width = `${(width / 100) * img.clientWidth}px`;
-        hotspot.style.height = `${(height / 100) * img.clientHeight}px`;
+        hotspot.style.top = ${(top / 100) * img.clientHeight}px;
+        hotspot.style.left = ${(left / 100) * img.clientWidth}px;
+        hotspot.style.width = ${(width / 100) * img.clientWidth}px;
+        hotspot.style.height = ${(height / 100) * img.clientHeight}px;
       });
     }
 
