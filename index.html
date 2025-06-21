@@ -140,7 +140,7 @@
 
     document.getElementById('complete').addEventListener('click', () => {
       const inputText = encodeURIComponent(state.join(', '));
-      fetch(`https://script.google.com/macros/s/AKfycbxolvELfuqdngAqd_bnTipIfh_W0z3oYsEzZTCgAQ2dJPwO4Id4mJd03wSB-ifcMo9y3Q/exec?text=${inputText}`)
+      fetch(`https://script.google.com/macros/s/AKfycby0fP4N_PKoxXfRK6aWrXJ3R8AmDkfjVDQ-P7B9paBL2-uuTqMVHjZ7G7R-1dlK0BhoSw/exec?text=${inputText}`)
         .then(res => res.json())
         .then(data => {
           resultDiv.innerHTML = `${data.count}人があなたと同じ食べ方をしました！`;
