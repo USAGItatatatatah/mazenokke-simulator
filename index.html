@@ -48,7 +48,7 @@
     <div class="hotspot" data-name="オクラ＆温玉" data-top="15.94" data-left="35.00" data-width="25.00" data-height="36.82"></div>
     <div class="hotspot" data-name="かつおぶし" data-top="21.19" data-left="60.00" data-width="22.50" data-height="26.19"></div>
     <div class="hotspot" data-name="ご飯" data-top="39.69" data-left="10.00" data-width="31.25" data-height="54.61"></div>
-    <div class="hotspot" data-name="味噌汁" data-top="41.12" data-left="41.25" data-width="27.25" data-height="50.21"></div>
+    <div class="hotspot" data-name="味噌汁" data-top="43.12" data-left="41.25" data-width="27.25" data-height="50.21"></div>
     <div class="hotspot" data-name="牛皿" data-top="45.12" data-left="65.00" data-width="25.00" data-height="45.02"></div>
     <div class="actions" id="actions"></div>
   </div>
@@ -139,19 +139,15 @@
     });
 
     document.getElementById('complete').addEventListener('click', () => {
-      const inputText = state.join(', ');
-      fetch('https://script.google.com/macros/s/AKfycbxGqNAUM3O1c8CVizo9QEJ-1d9s_7NfJoEFZfhXhQwIlehLbXo7fgRAI9vbTNPG-f7kIA/exec', {
-        method: 'POST',
-        body: JSON.stringify({ text: inputText }),
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(res => res.json())
-      .then(data => {
-        resultDiv.innerHTML = `${data.count}人があなたと同じ食べ方をしました！`;
-      })
-      .catch(() => {
-        resultDiv.innerHTML = '送信に失敗しました。';
-      });
+      const inputText = encodeURIComponent(state.join(', '));
+      fetch(`https://script.google.com/macros/s/AKfycbxaMQylGVqhb0UPard6fjsh8cpHIE4BoW5h7jPmAAF-Z8t1Xximh9VXA7Dg34AELK1GVQ/exec?text=${inputText}`)
+        .then(res => res.json())
+        .then(data => {
+          resultDiv.innerHTML = `${data.count}人があなたと同じ食べ方をしました！`;
+        })
+        .catch(() => {
+          resultDiv.innerHTML = '送信に失敗しました。';
+        });
     });
 
     document.addEventListener('click', (e) => {
