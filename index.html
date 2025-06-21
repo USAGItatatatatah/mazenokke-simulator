@@ -32,25 +32,6 @@
       background: none;
     }
   </style>
-  <!-- Firebase SDK追加 -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "",
-      authDomain: "mazenokke-simulator.firebaseapp.com",
-      projectId: "mazenokke-simulator",
-      storageBucket: "mazenokke-simulator.firebasestorage.app",
-      messagingSenderId: "1015816675107",
-      appId: "1:1015816675107:web:377d3890c4a6f79edd3696"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.firebaseDB = db;
-    window.firebaseFns = { collection, addDoc, query, where, getDocs };
-  </script>
 </head>
 <body>
   <h1>まぜのっけ朝食シミュレーター</h1>
@@ -83,7 +64,7 @@
         actions: ['混ぜる', 'ご飯に乗せる', '半分だけ乗せる', 'そのまま食べる']
       },
       '牛皿': {
-        actions: ['ご飯に乗せる', '食べる','オクラ＆温玉に入れる']
+        actions: ['ご飯に乗せる', '食べる', 'オクラ＆温玉に入れる']
       },
       'かつおぶし': {
         actions: ['ご飯にかける', 'オクラ＆温玉にかける', '牛皿にかける']
@@ -157,26 +138,20 @@
       });
     });
 
-    document.getElementById('complete').addEventListener('click', async () => {
-      const text = state.join(', ');
-      const db = window.firebaseDB;
-      const { collection, addDoc, query, where, getDocs } = window.firebaseFns;
-      const col = collection(db, "eatingLogs");
-
-      const q = query(col, where("text", "==", text));
-      const snapshot = await getDocs(q);
-      const count = snapshot.size;
-
-      await addDoc(col, {
-        text: text,
-        date: new Date()
-      });
-
-      if (count === 0) {
-        resultDiv.innerHTML = `あなたと同じ食べ方をした人はまだいません。<br>しかしそれは決して恥じることではないのです。`;
-      } else {
-        resultDiv.innerHTML = `${count}人があなたと同じ食べ方をしました！`;
-      }
+    document.getElementById('complete').addEventListener('click', () => {
+      const inputText = encodeURIComponent(state.join(', '));
+      fetch(`https://script.google.com/macros/s/AKfycbzAICPXh6y_IMPn_mFrO-_TIa5w4uvQH3Jc8IPGZr-Sw5LOlEEIIVobtNdaeCOl6DnJ-Q/exec?text=${inputText}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.count === 0) {
+            resultDiv.innerHTML = `あなたと同じ食べ方をした人はまだいません。<br>しかしそれは決して恥じることではないのです。`;
+          } else {
+            resultDiv.innerHTML = `${data.count}人があなたと同じ食べ方をしました！`;
+          }
+        })
+        .catch(() => {
+          resultDiv.innerHTML = '送信に失敗しました。';
+        });
     });
 
     document.addEventListener('click', (e) => {
