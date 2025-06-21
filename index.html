@@ -140,7 +140,7 @@
 
     document.getElementById('complete').addEventListener('click', () => {
       const inputText = encodeURIComponent(state.join(', '));
-      fetch(`https://script.google.com/macros/s/AKfycbyhaOgsYQUaNR0UDz85DUA9o67pptuNB-CBSBdjmPqKXqi6j3RvVcLWpxlviQ_up16ORg/exec?text=${inputText}`)
+      fetch(`https://script.google.com/macros/s/AKfycbyWn80DMPMakwtY4iyLlB6UmZDHe7y3ay1XiKYRXyNZSkqmSf-s4C8057TQp7oPWmLtHw/exec?text=${inputText}`)
         .then(res => res.json())
         .then(data => {
           if (data.count === 0) {
