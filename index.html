@@ -144,9 +144,9 @@
         .then(res => res.json())
         .then(data => {
           if (data.count -1 === 0) {
-            resultDiv.innerHTML = `あなたと同じ食べ方をした人はまだいません。<br>しかしそれは決して恥じることではないのです。`;
+            resultDiv.innerHTML = `あなたと同じ食べ方をした人はまだいないようです！<br>しかしそれは決して恥じることではないのです。`;
           } else {
-            resultDiv.innerHTML = `${data.count}人があなたと同じ食べ方をしました！`;
+            resultDiv.innerHTML = `${data.count -1}人があなたと全く同じ食べ方をしました！ すごい奇跡！`;
           }
         })
         .catch(() => {
