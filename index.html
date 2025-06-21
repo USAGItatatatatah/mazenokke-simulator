@@ -172,7 +172,11 @@
         date: new Date()
       });
 
-      resultDiv.innerHTML = `${count}人があなたと同じ食べ方をしました！`;
+      if (count === 0) {
+        resultDiv.innerHTML = `あなたと同じ食べ方をした人はまだいません。<br>しかしそれは決して恥じることではないのです。`;
+      } else {
+        resultDiv.innerHTML = `${count}人があなたと同じ食べ方をしました！`;
+      }
     });
 
     document.addEventListener('click', (e) => {
