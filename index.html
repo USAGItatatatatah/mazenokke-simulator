@@ -32,6 +32,25 @@
       background: none;
     }
   </style>
+  <!-- Firebase SDK追加 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDyFijzOlU9dDu53a1cx-qYT5Z-jAjA5_M",
+      authDomain: "mazenokke-simulator.firebaseapp.com",
+      projectId: "mazenokke-simulator",
+      storageBucket: "mazenokke-simulator.firebasestorage.app",
+      messagingSenderId: "1015816675107",
+      appId: "1:1015816675107:web:377d3890c4a6f79edd3696"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.firebaseDB = db;
+    window.firebaseFns = { collection, addDoc, query, where, getDocs };
+  </script>
 </head>
 <body>
   <h1>まぜのっけ朝食シミュレーター</h1>
@@ -138,22 +157,22 @@
       });
     });
 
-    document.getElementById('complete').addEventListener('click', () => {
-      const inputText = state.join(', '); // encodeURIComponent は不要
-      fetch('https://script.google.com/macros/s/AKfycbx5vYYft-nWoPn9wBUU4XWFrwgtg8HJh29qAtL4tBRaqnsrtT0WVaVKDe7hW-4S_58IHA/exec', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `text=${encodeURIComponent(inputText)}`
-      })
-        .then(res => res.json())
-        .then(data => {
-          resultDiv.innerHTML = `${data.count}人があなたと同じ食べ方をしました！`;
-        })
-        .catch(() => {
-          resultDiv.innerHTML = '送信に失敗しました。';
-        });
+    document.getElementById('complete').addEventListener('click', async () => {
+      const text = state.join(', ');
+      const db = window.firebaseDB;
+      const { collection, addDoc, query, where, getDocs } = window.firebaseFns;
+      const col = collection(db, "eatingLogs");
+
+      const q = query(col, where("text", "==", text));
+      const snapshot = await getDocs(q);
+      const count = snapshot.size;
+
+      await addDoc(col, {
+        text: text,
+        date: new Date()
+      });
+
+      resultDiv.innerHTML = `${count}人があなたと同じ食べ方をしました！`;
     });
 
     document.addEventListener('click', (e) => {
