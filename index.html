@@ -140,18 +140,9 @@
 
     document.getElementById('complete').addEventListener('click', () => {
       const inputText = encodeURIComponent(state.join(', '));
-      fetch(`https://script.google.com/macros/s/AKfycbyWn80DMPMakwtY4iyLlB6UmZDHe7y3ay1XiKYRXyNZSkqmSf-s4C8057TQp7oPWmLtHw/exec?text=${inputText}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.count === 0) {
-            resultDiv.innerHTML = `あなたと同じ食べ方をした人はまだいません。<br>しかしそれは決して恥じることではないのです。`;
-          } else {
-            resultDiv.innerHTML = `${data.count}人があなたと同じ食べ方をしました！`;
-          }
-        })
-        .catch(() => {
-          resultDiv.innerHTML = '送信に失敗しました。';
-        });
+      const googleFormURL = `https://docs.google.com/forms/d/e/1FAIpQLSdo-MLN0S-lsD0jSDuNvkV98gb85Ipso8AXyPmSZiAR4tX7bQ/viewform?usp=pp_url&entry.963564918=${inputText}`;
+      window.open(googleFormURL, '_blank');
+      resultDiv.innerHTML = `送信用フォームが開きました。内容を確認して送信してください。`;
     });
 
     document.addEventListener('click', (e) => {
